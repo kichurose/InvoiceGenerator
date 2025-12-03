@@ -1,0 +1,159 @@
+<div class="invoice-generator" [formGroup]="invoiceForm">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-buttons">
+      <button type="button" class="btn btn-outline" (click)="downloadInvoice()">
+        <span class="icon">⬇</span> Download
+      </button>
+      <button type="button" class="btn btn-outline" (click)="printInvoice()">
+        <span class="icon">🖨</span> Print
+      </button>
+    </div>
+  </div>
+
+  <!-- Invoice Template -->
+  <div class="invoice-template">
+    <!-- Header Section -->
+    <div class="invoice-header-section">
+      <div class="company-logo">
+        <div class="logo-upload" (click)="logoInput.click()">
+          <div *ngIf="!logoPreview" class="logo-placeholder">
+            <span class="upload-icon">📷</span>
+            <span>Upload Logo</span>
+            <small>Click to upload company logo</small>
+          </div>
+          <img *ngIf="logoPreview" [src]="logoPreview" alt="Company Logo" class="logo-preview">
+          <input #logoInput type="file" (change)="onLogoUpload($event)" accept="image/*" style="display: none;">
+        </div>
+        
+        <!-- Company Details -->
+        <div class="company-details">
+        </div>
+      </div>
+
+      <div class="invoice-title-section">
+        <h1 class="invoice-title">Invoice</h1>
+        
+        <div class="right-company-details">
+          <input type="text" formControlName="companyName" placeholder="Company Name" class="right-company-input company-name-right">
+          <input type="text" formControlName="city" placeholder="City" class="right-company-input">
+          
+          <input type="text" formControlName="state" placeholder="State" class="right-company-input">
+          <input type="text" formControlName="contact" placeholder="Contact" class="right-company-input">
+          <input type="email" formControlName="email" placeholder="Email" class="right-company-input">
+        </div>
+      </div>
+    </div>
+
+    <!-- Bill To and Invoice Date Section -->
+    <div class="invoice-info-section">
+      <div class="bill-to-container">
+        <h3>Bill To:</h3>
+        <div class="client-details">
+          <input type="text" formControlName="clientCompany" placeholder="Client Name" class="client-input">
+          <input type="text" formControlName="clientCity" placeholder="City" class="client-input">
+          <input type="text" formControlName="clientCountry" placeholder="Country" class="client-input">
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoice Date and Number -->
+    <div class="place-of-supply-section">
+      <div class="supply-date-row">
+        <div class="invoice-number">
+          <label>Invoice Number: </label>
+          <input type="text" formControlName="invoiceNumber" class="number-input">
+        </div>
+        <div class="invoice-date">
+          <label>Invoice Date: </label>
+          <input type="date" formControlName="invoiceDate" class="date-input">
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoice Table -->
+    <div class="invoice-table-section">
+      <table class="professional-table">
+        <thead>
+          <tr>
+            <th class="item-col">#</th>
+            <th class="description-col">Item Description</th>
+            <th class="qty-col">Qty</th>
+            <th class="rate-col">Rate</th>
+            <th class="sgst-col">SGST</th>
+            <th class="cgst-col">CGST</th>
+            <th class="amount-col">Amount</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="items">
+          <tr *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="item-row">
+            <td class="item-number">{{ i + 1 }}</td>
+            <td class="description-cell">
+              <input type="text" formControlName="description" class="table-input description-input" (input)="onItemChange(i)">
+            </td>
+            <td class="qty-cell">
+              <input type="number" formControlName="qty" class="table-input number-input" (input)="onItemChange(i)">
+            </td>
+            <td class="rate-cell">
+              <input type="number" formControlName="rate" class="table-input number-input" step="0.01" (input)="onItemChange(i)">
+            </td>
+            <td class="tax-cell">
+              <input type="number" formControlName="sgst" class="table-input tax-input" min="0" max="100">
+            </td>
+            <td class="tax-cell">
+              <input type="number" formControlName="cgst" class="table-input tax-input" min="0" max="100">
+            </td>
+            <td class="amount-cell">
+              {{ item.get('amount')?.value | number:'1.2-2' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="table-actions">
+        <button type="button" class="btn btn-link" (click)="addLineItem()">
+          <span class="icon">+</span> Add Line Item
+        </button>
+        <button type="button" class="btn btn-link remove-btn" (click)="removeLineItem(items.length - 1)" *ngIf="items.length > 1">
+          <span class="icon">−</span> Remove
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary-section">
+      <div class="summary-container">
+        <div class="summary-row">
+          <span class="summary-label">Sub Total</span>
+          <span class="summary-value">{{ getSubTotal() | number:'1.2-2' }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Shipping Charges</span>
+          <input type="number" formControlName="shippingCharges" class="shipping-input" min="0" step="0.01">
+        </div>
+        <div class="summary-row total-row">
+          <span class="summary-label total-label">TOTAL</span>
+          <span class="summary-value total-value">Rs.{{ getGrandTotal() | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes Section -->
+    <div class="notes-section">
+      <div class="notes-container">
+        <h4>Notes</h4>
+        <textarea formControlName="notes" placeholder="Thank you for your purchase" class="notes-textarea"></textarea>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="invoice-footer-section">
+      <div class="footer-text">
+        <p><input type="text" formControlName="footerMessage" class="footer-input"> - <span class="company-name-footer">{{ invoiceForm.get('companyName')?.value }}</span></p>
+      </div>
+      
+      
+    </div>
+  </div>
+</div>
+
