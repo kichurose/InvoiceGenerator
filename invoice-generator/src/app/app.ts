@@ -44,7 +44,7 @@ export class App {
       email: ['flametofable@gmail.com'],
       
       // Bill To Details
-      clientCompany: ['Shaheen N S'],
+      clientCompany: ['Your Name'],
       clientGstin: ['Client\'s GSTIN'],
       clientAddress: ['Client\'s Address'],
       clientCity: ['Kerala'],

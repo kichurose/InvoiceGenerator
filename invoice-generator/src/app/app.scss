@@ -648,6 +648,27 @@
   }
 }
 
+.footer-qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  
+  .footer-qr-code {
+    max-width: 80px;
+    max-height: 80px;
+    width: auto;
+    height: auto;
+  }
+  
+  .qr-label {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+  }
+}
+
 .terms-section {
   h4 {
     font-size: 16px;
